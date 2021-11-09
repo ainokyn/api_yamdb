@@ -3,15 +3,15 @@ from django.db import models
 
 class Genre(models.Model):
     """
-    Жанры произведений.
-    Одно произведение может быть привязано к нескольким жанрам.
+    Genre of titles.
+    One title can be linked to several genres.
     """
-    name = models.CharField(max_length=200, verbose_name='Жанр', unique=True)
+    name = models.CharField(max_length=200, verbose_name='Genre', unique=True)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
-        verbose_name = 'Жанр'
-        verbose_name_plural = 'Жанры'
+        verbose_name = 'Genre'
+        verbose_name_plural = 'Genres'
 
     def __str__(self):
         return self.name
@@ -19,14 +19,14 @@ class Genre(models.Model):
 
 class Category(models.Model):
     """
-    Категории (типы) произведений («Фильмы», «Книги», «Музыка»).
+    Category of genres («Films», «Books», «Music»).
     """
-    name = models.CharField(max_length=200, verbose_name='Категория', unique=True)
+    name = models.CharField(max_length=200, verbose_name='Category', unique=True)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         return self.name
@@ -34,37 +34,36 @@ class Category(models.Model):
 
 class Title(models.Model):
     """
-    Произведения, к которым пишут отзывы
-    (определённый фильм, книга или композиция).
+    Genres with users reviews.
     """
-    name = models.CharField(max_length=200, verbose_name='Произведение')
+    name = models.CharField(max_length=200, verbose_name='Title')
     year = models.IntegerField(
-        verbose_name='Год издания',
+        verbose_name='Year of publishing',
         blank=True,
         null=True,
     )
-    description = models.CharField(
+    description = models.TextField(
         max_length=200,
-        verbouse_name='Описание',
+        verbose_name='Description',
         blank=True,
         null=True,
     )
     genre = models.ManyToManyField(
         Genre,
-        on_delete=models.SET_NULL,
         blank=True,
-        null=True,
+        related_name='genre',
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        on_delete=models.SET_NULL,
+        related_name='category',
     )
 
     class Meta:
-        verbose_name = 'Произведение'
-        verbose_name_plural = 'Произведения'
+        verbose_name = 'Title'
+        verbose_name_plural = 'Titles'
 
     def __str__(self):
         return self.name
