@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import CustomUser
+
 
 class Genre(models.Model):
     """
@@ -21,7 +23,8 @@ class Category(models.Model):
     """
     Category of genres («Films», «Books», «Music»).
     """
-    name = models.CharField(max_length=200, verbose_name='Category', unique=True)
+    name = models.CharField(max_length=200, verbose_name='Category',
+                            unique=True)
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -67,3 +70,54 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Reviews(models.Model):
+    """Description of the Reviews model."""
+    SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
+                     (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), ]
+    author = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='reviews')
+    titles = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews')
+    text = models.TextField()
+    score = models.CharField(
+        max_length=2,
+        choices=SCORE_CHOICES,
+        default=1, verbose_name='score')
+    pub_date = models.DateTimeField(
+        'date of publication review', auto_now_add=True, db_index=True)
+
+    class Meta:
+        """Function for creating a unique combination."""
+        constraints = [
+            models.UniqueConstraint(fields=['author', 'titles'],
+                                    name='unique_reviews')
+        ]
+        verbose_name = 'Review'
+        verbose_name_plural = 'Reviews'
+
+    def __str__(self):
+        return self.text
+
+
+class Comments(models.Model):
+    """Description of the Comments model."""
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+                               related_name='comments')
+    reviews = models.ForeignKey(Reviews, on_delete=models.CASCADE,
+                                related_name='comments')
+    text = models.TextField()
+    pub_date = models.DateTimeField(
+        'date of publication comment', auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+
+    def __str__(self):
+        return self.text
