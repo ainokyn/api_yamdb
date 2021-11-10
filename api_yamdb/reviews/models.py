@@ -1,6 +1,5 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
 from users.models import CustomUser
 
 
@@ -52,9 +51,11 @@ class Title(models.Model):
         blank=True,
         null=True,
     )
-    genre = models.ManyToManyField(
+    genre = models.ForeignKey(
         Genre,
         blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
         related_name='genre',
     )
     category = models.ForeignKey(

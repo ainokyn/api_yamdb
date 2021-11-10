@@ -1,8 +1,24 @@
+from rest_framework import serializers
+from reviews.models import Category, Genre
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 User = get_user_model()
 
+class CategorySerializer(serializers.ModelSerializer):
+    name = serializers.SlugRelatedField(slug_field='slug',read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    name = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Genre
 
 class SignUpSerializer(serializers.ModelSerializer):
     """Serializer for signup requests."""

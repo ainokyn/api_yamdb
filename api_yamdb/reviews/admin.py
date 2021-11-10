@@ -11,7 +11,7 @@ class TitleAdmin(admin.ModelAdmin):
 
 
 class ReviewAdmin(admin.ModelAdmin):
-    """Class that configures the display of Title  model. """
+    """Class that configures the display of Review  model. """
     list_display = ('pk', 'author', 'titles', 'text')
     search_fields = ('author',)
     list_filter = ('pub_date',)
@@ -19,7 +19,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 
 class CommentsAdmin(admin.ModelAdmin):
-    """Class that configures the display of Title  model. """
+    """Class that configures the display of Comments  model. """
     list_display = ('pk', 'author', 'reviews', 'text')
     search_fields = ('author',)
     list_filter = ('pub_date',)
