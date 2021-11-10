@@ -1,3 +1,4 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from users.models import CustomUser
@@ -72,7 +73,7 @@ class Title(models.Model):
         return self.name
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     """Description of the Reviews model."""
     SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
                      (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), ]
@@ -85,10 +86,11 @@ class Reviews(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews')
     text = models.TextField()
-    score = models.CharField(
-        max_length=2,
+    score = models.IntegerField(
         choices=SCORE_CHOICES,
-        default=1, verbose_name='score')
+        default=1, verbose_name='score',
+        validators=[MinValueValidator(1),
+                    MaxValueValidator(10)])
     pub_date = models.DateTimeField(
         'date of publication review', auto_now_add=True, db_index=True)
 
@@ -109,7 +111,7 @@ class Comments(models.Model):
     """Description of the Comments model."""
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
                                related_name='comments')
-    reviews = models.ForeignKey(Reviews, on_delete=models.CASCADE,
+    reviews = models.ForeignKey(Review, on_delete=models.CASCADE,
                                 related_name='comments')
     text = models.TextField()
     pub_date = models.DateTimeField(
