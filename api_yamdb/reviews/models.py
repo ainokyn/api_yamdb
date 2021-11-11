@@ -1,6 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from users.models import CustomUser
+
+User = get_user_model()
 
 
 class Genre(models.Model):
@@ -79,7 +81,7 @@ class Review(models.Model):
     SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
                      (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), ]
     author = models.ForeignKey(
-        CustomUser,
+        User,
         on_delete=models.CASCADE,
         related_name='reviews')
     titles = models.ForeignKey(
@@ -110,7 +112,7 @@ class Review(models.Model):
 
 class Comments(models.Model):
     """Description of the Comments model."""
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='comments')
     reviews = models.ForeignKey(Review, on_delete=models.CASCADE,
                                 related_name='comments')

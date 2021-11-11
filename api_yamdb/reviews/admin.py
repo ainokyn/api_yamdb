@@ -5,7 +5,7 @@ from .models import Comments, Review, Title
 
 class TitleAdmin(admin.ModelAdmin):
     """Class that configures the display of Title  model. """
-    list_display = ('pk', 'year', 'description',  'category', 'name')
+    list_display = ('pk', 'year', 'description', 'category', 'name')
     search_fields = ('name',)
     empty_value_display = '-пусто-'
 
