@@ -12,6 +12,7 @@ from django.core.mail import send_mail
 
 from reviews.models import Category, Genre, Title
 
+from .permissions import IsAdmin
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TokenRequestSerializer, UserSerializer)
@@ -153,6 +154,7 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = pagination.LimitOffsetPagination
     search_fields = ('username',)
     lookup_field = 'username'
+    permission_classes = (IsAdmin,)
 
     @action(
         url_path='me',
