@@ -18,3 +18,4 @@ with open(r"C:\Users\Я\Desktop\Проекты\api_yamdb\api_yamdb\static\data\c
             )"""
         )
         c.executemany("INSERT INTO category VALUES(?, ?, ?)", id, name, slug)
+
