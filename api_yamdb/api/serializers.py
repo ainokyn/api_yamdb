@@ -1,3 +1,5 @@
+import datetime as dt
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -8,19 +10,37 @@ from reviews.models import Category, Comments, Genre, Review, Title
 User = get_user_model()
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+class TitleSerializer(serializers.ModelSerializer):
+    """Serializer for title requests."""
 
     class Meta:
-        fields = '__all__'
+        fields = ( 
+            'name', 
+            'year', 
+            'description', 
+            'genre', 
+            'category')
+        model = Title
+
+    def get_year(self, year):
+        """Check the year."""
+        current_year = dt.datetime.now().year
+        if year > current_year:
+            raise serializers.ValidationError("invalid value")
+        return year
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Serializer for category requests."""
+
+    class Meta:
+        fields = ('id', 'name', 'slug')
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(slug_field='slug', read_only=True)
-
+    """Serializer for genre requests."""
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'name', 'slug')
         model = Genre
 
 
