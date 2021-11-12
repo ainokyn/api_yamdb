@@ -10,7 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 
 from reviews.models import Category, Genre, Title
-
+from .permissions import AnonymModeratorAdminAuthor
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TokenRequestSerializer)
@@ -21,6 +21,7 @@ User = get_user_model()
 class ReviewViewSet(viewsets.ModelViewSet):
     """Review endpoint handler."""
     serializer_class = ReviewSerializer
+    permission_classes = (AnonymModeratorAdminAuthor,)
 
     def get_queryset(self):
         """Overriding the get_queryset() method."""
@@ -42,6 +43,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
+    permission_classes = (AnonymModeratorAdminAuthor,)
     """Comments endpoint handler."""
     serializer_class = CommentsSerializer
 
