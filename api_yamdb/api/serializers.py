@@ -90,3 +90,24 @@ class TokenRequestSerializer(serializers.Serializer):
 
     class Meta:
         require_fields = ('username', 'confirmation_code')
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Custom User model serializer."""
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role',
+        )
+
+    def update(self, obj, validated_data):
+        """Update user profile."""
+        request = self.context.get('request')
+        user = request.user
+
+        is_admin = user.role == 'admin'
+        if not user.is_superuser or not is_admin:
+            validated_data.pop('role', None)
+
+        return super().update(obj, validated_data)

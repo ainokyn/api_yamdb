@@ -1,4 +1,5 @@
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, pagination, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,9 +12,10 @@ from django.core.mail import send_mail
 
 from reviews.models import Category, Genre, Title
 
+from .permissions import IsAdmin
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TokenRequestSerializer)
+                          TokenRequestSerializer, UserSerializer)
 
 User = get_user_model()
 
@@ -141,4 +143,41 @@ class CreateTokenView(APIView):
                 'token': str(token.access_token)
             }
             return Response(response, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """Users endpoint handler."""
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = (filters.SearchFilter,)
+    pagination_class = pagination.LimitOffsetPagination
+    search_fields = ('username',)
+    lookup_field = 'username'
+    permission_classes = (IsAdmin,)
+
+    @action(
+        url_path='me',
+        methods=['get'],
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def get_current_user_info(self, request):
+        """Retrieve the current user profile data."""
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @get_current_user_info.mapping.patch
+    def update_current_user_info(self, request):
+        """Update (partial) the current user profile data."""
+        serializer = UserSerializer(
+            request.user,
+            data=request.data,
+            partial=True,
+            context={'request': request}
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
