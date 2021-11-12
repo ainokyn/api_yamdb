@@ -23,7 +23,7 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
 
     def get_year(self, year):
-        """ Check the year."""
+        """Check the year."""
         current_year = dt.datetime.now().year
         if year > current_year:
             raise serializers.ValidationError("invalid value")
