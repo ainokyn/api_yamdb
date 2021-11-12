@@ -1,5 +1,7 @@
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.generics import get_object_or_404
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -13,7 +15,7 @@ from reviews.models import Category, Genre, Title
 
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TokenRequestSerializer)
+                          TitleSerializer, TokenRequestSerializer)
 
 User = get_user_model()
 
@@ -73,6 +75,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
@@ -80,14 +83,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('category', 'genre', 'name', 'year')
+    search_fields = ('id', 'category', 'genre', 'name', 'year')
 
 
 class SignUpView(APIView):
