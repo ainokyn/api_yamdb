@@ -14,6 +14,7 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Genre'
         verbose_name_plural = 'Genres'
 
@@ -30,6 +31,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
@@ -69,6 +71,7 @@ class Title(models.Model):
     )
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Title'
         verbose_name_plural = 'Titles'
 

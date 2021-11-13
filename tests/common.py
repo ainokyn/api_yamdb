@@ -1,6 +1,7 @@
-from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from django.contrib.auth import get_user_model
 
 
 def create_users_api(admin_client):
@@ -100,16 +101,16 @@ def create_comments(admin_client, admin):
     def create_comment(uclient, title_id, review_id, text):
         data = {'text': text}
         response = uclient.post(f'/api/v1/titles/{title_id}/reviews/{review_id}/comments/', data=data)
-        return response.json()['id']
-
+        print("!!!!", response.text, response.status_code)
     reviews, titles, user, moderator = create_reviews(admin_client, admin)
     client_user = auth_client(user)
     client_moderator = auth_client(moderator)
     result = list()
+    print(result)
     result.append({'id': create_comment(admin_client, titles[0]["id"], reviews[0]["id"], 'qwerty'),
                    'author': admin.username, 'text': 'qwerty'})
     result.append({'id': create_comment(client_user, titles[0]["id"], reviews[0]["id"], 'qwerty123'),
                    'author': user.username, 'text': 'qwerty123'})
     result.append({'id': create_comment(client_moderator, titles[0]["id"], reviews[0]["id"], 'qwerty321'),
                    'author': moderator.username, 'text': 'qwerty321'})
-    return result, reviews, titles, user, moderator
+    print(result, reviews, titles, user, moderator)

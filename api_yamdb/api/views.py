@@ -1,6 +1,8 @@
 from django.http import request
-from rest_framework import filters, pagination, permissions, status, viewsets
+from rest_framework import (filters, mixins, pagination, permissions, status,
+                            viewsets)
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
@@ -12,18 +14,24 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.db.models import Avg
 from django.db.models.aggregates import Avg
 
 from reviews.models import Category, Genre, Review, Title
 
-from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
+from .permissions import IsAdmin, IsAdminOrReadOnly, AnonymModeratorAdminAuthor
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleSerializer, TokenRequestSerializer,
+                          TitleCreateSerializer, TokenRequestSerializer,
                           UserSerializer)
 
 User = get_user_model()
+
+
+class CustomGetOrPostViewSet(mixins.CreateModelMixin,
+                             mixins.ListModelMixin,
+                             mixins.DestroyModelMixin,
+                             viewsets.GenericViewSet):
+    pass
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -33,19 +41,19 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Overriding the get_queryset() method."""
-        title_id = self.kwargs['title_id']
+        title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
         return title.reviews.all()
 
     def perform_create(self, serializer):
         """Overriding the perform_create() method."""
-        title_id = self.kwargs['title_id']
+        title_id = self.kwargs.get('title_id')
         get_object_or_404(Title, id=title_id)
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
         """Overriding the perform_create() method."""
-        title_id = self.kwargs['title_id']
+        title_id = self.kwargs.get('title_id')
         get_object_or_404(Title, id=title_id)
         serializer.save(author=self.request.user)
 
@@ -57,16 +65,16 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Overriding the get_queryset() method."""
-        title_id = self.kwargs['title_id']
-        review_id = self.kwargs['review_id']
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
         title = get_object_or_404(Title, id=title_id)
         reviews = get_object_or_404(title.reviews, id=review_id)
         return reviews.comments.all()
 
     def perform_create(self, serializer):
         """Overriding the perform_create() method."""
-        title_id = self.kwargs['title_id']
-        review_id = self.kwargs['review_id']
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
         title = get_object_or_404(Title, id=title_id)
         get_object_or_404(title.reviews, id=review_id)
         reviews = get_object_or_404(title.reviews, id=review_id)
@@ -74,39 +82,43 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         """Overriding the perform_update() method."""
-        title_id = self.kwargs['title_id']
-        review_id = self.kwargs['review_id']
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
         title = get_object_or_404(Title, id=title_id)
         get_object_or_404(title.reviews, id=review_id)
         reviews = get_object_or_404(title.reviews, id=review_id)
         serializer.save(reviews=reviews, author=self.request.user)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CustomGetOrPostViewSet):
     """Category endpoint handler."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminOrReadOnly, )
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CustomGetOrPostViewSet):
     """Genre endpoint handler."""
     queryset = Genre.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
     serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
-class TitleViewSet(viewsets.ModelViewSet):
+class TitleViewSet(CustomGetOrPostViewSet):
     """Title endpoint handler."""
-    permission_classes = (IsAdminOrReadOnly, )
-    serializer_class = TitleSerializer
-    pagination_class = LimitOffsetPagination
+    queryset = Title.objects.all()
+    serializer_class = TitleCreateSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('id', 'category', 'genre', 'name', 'year')
     queryset = Title.objects.annotate(
