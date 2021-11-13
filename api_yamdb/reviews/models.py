@@ -52,8 +52,6 @@ class Title(models.Model):
     description = models.TextField(
         max_length=200,
         verbose_name='Description',
-        blank=True,
-        null=True,
     )
     genre = models.ForeignKey(
         Genre,

@@ -21,7 +21,8 @@ from reviews.models import Category, Genre, Review, Title
 from .permissions import IsAdmin, IsAdminOrReadOnly, AnonymModeratorAdminAuthor
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleCreateSerializer, TokenRequestSerializer,
+                          TitleReadSerializer,
+                          TitleWriteSerializer, TokenRequestSerializer,
                           UserSerializer)
 
 User = get_user_model()
@@ -113,10 +114,9 @@ class GenreViewSet(CustomGetOrPostViewSet):
     lookup_field = 'slug'
 
 
-class TitleViewSet(CustomGetOrPostViewSet):
+class TitleViewSet(viewsets.ModelViewSet):
     """Title endpoint handler."""
     queryset = Title.objects.all()
-    serializer_class = TitleCreateSerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
@@ -124,6 +124,10 @@ class TitleViewSet(CustomGetOrPostViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     )
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleReadSerializer 
+        return TitleWriteSerializer
 
 
 class SignUpView(APIView):

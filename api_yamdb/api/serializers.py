@@ -1,4 +1,5 @@
 import datetime as dt
+from .validate import validate_year
 
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -25,28 +26,28 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
-class TitleCreateSerializer(serializers.ModelSerializer):
-    """Serializer for title requests."""
+class TitleReadSerializer (serializers.ModelSerializer):
+    """Title serializer for GET request."""
     rating = serializers.IntegerField()
+    year = serializers.IntegerField(validators=[validate_year])
 
     class Meta:
-        fields = (
-            'id',
-            'name',
-            'year', 
-            'description', 
-            'genre', 
-            'category',
-            'rating'
-            )
+        fields = '__all__'
         model = Title
 
-    def validate_year(self, value):
-        """Check the year."""
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError('Invalid value')
-        return value
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    """Title serializer for POST, PATCH request."""
+    genre = serializers.SlugRelatedField(
+        slug_field='titles', queryset=Genre.objects.all())
+    category = serializers.SlugRelatedField(
+        slug_field='titles', queryset=Category.objects.all())
+    year = serializers.IntegerField(validators=[validate_year])
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -104,7 +105,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comments
-        fields = ('id', 'text', 'pub_date', 'author')
+        fields = '__all__'
 
 
 class TokenRequestSerializer(serializers.Serializer):
