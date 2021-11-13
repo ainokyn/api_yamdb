@@ -1,11 +1,11 @@
-import datetime as dt
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from django.contrib.auth import get_user_model
 
 from reviews.models import Category, Comments, Genre, Review, Title
+
+from .validate import validate_year
 
 User = get_user_model()
 
@@ -25,24 +25,31 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
-class TitleCreateSerializer(serializers.ModelSerializer):
-    """Serializer for title requests."""
+class TitleReadSerializer (serializers.ModelSerializer):
+    """Title serializer for GET request."""
+    rating = serializers.IntegerField()
+    genre = serializers.SlugRelatedField(
+        slug_field='name', queryset=Genre.objects.all())
+    category = serializers.SlugRelatedField(
+        slug_field='name', queryset=Category.objects.all())
+    year = serializers.IntegerField(validators=[validate_year])
 
     class Meta:
-        fields = ( 
-            'name', 
-            'year', 
-            'description', 
-            'genre', 
-            'category')
+        fields = '__all__'
         model = Title
 
-    def validate_year(self, value):
-        """Check the year."""
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError('Invalid value')
-        return value
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    """Title serializer for POST, PATCH request."""
+    genre = serializers.SlugRelatedField(
+        slug_field='name', queryset=Genre.objects.all())
+    category = serializers.SlugRelatedField(
+        slug_field='name', queryset=Category.objects.all())
+    year = serializers.IntegerField(validators=[validate_year])
+
+    class Meta:
+        fields = '__all__'
+        model = Title
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -66,12 +73,13 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Serializer for review requests."""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
-    title = serializers.SlugRelatedField(
+    titles = serializers.SlugRelatedField(
         slug_field='name', queryset=Title.objects.all())
 
     def validate_score(self, score):
@@ -82,8 +90,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'score', 'pub_date', 'author')
-        read_only_fields = ('id', 'pub_date', 'author')
+        fields = '__all__'
         validators = (
             UniqueTogetherValidator(
                 queryset=Review.objects.all(),
@@ -93,15 +100,14 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentsSerializer(serializers.ModelSerializer):
+    """Serializer for comments requests."""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True)
-    reviews = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comments
-        fields = ('id', 'text', 'reviews', 'pub_date', 'author')
-        read_only_fields = ('id', 'pub_date', 'author')
+        fields = '__all__'
 
 
 class TokenRequestSerializer(serializers.Serializer):

@@ -14,6 +14,7 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Genre'
         verbose_name_plural = 'Genres'
 
@@ -30,6 +31,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
@@ -50,25 +52,24 @@ class Title(models.Model):
     description = models.TextField(
         max_length=200,
         verbose_name='Description',
-        blank=True,
-        null=True,
     )
     genre = models.ForeignKey(
         Genre,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='genre',
+        related_name='titles',
     )
     category = models.ForeignKey(
         Category,
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='category',
+        related_name='titles',
     )
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Title'
         verbose_name_plural = 'Titles'
 
@@ -82,8 +83,7 @@ class Review(models.Model):
                      (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), ]
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        related_name='reviews')
+        on_delete=models.CASCADE)
     titles = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -112,8 +112,7 @@ class Review(models.Model):
 
 class Comments(models.Model):
     """Description of the Comments model."""
-    author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     reviews = models.ForeignKey(Review, on_delete=models.CASCADE,
                                 related_name='comments')
     text = models.TextField()
