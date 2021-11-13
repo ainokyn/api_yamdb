@@ -1,3 +1,5 @@
+import datetime as dt
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -8,19 +10,43 @@ from reviews.models import Category, Comments, Genre, Review, Title
 User = get_user_model()
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+class TitleSerializer(serializers.ModelSerializer):
+    """Serializer for title requests."""
+    rating = serializers.IntegerField()
 
     class Meta:
-        fields = '__all__'
+        fields = (
+            'id',
+            'name',
+            'year', 
+            'description', 
+            'genre', 
+            'category',
+            'rating'
+            )
+        model = Title
+
+    def get_year(self, year):
+        """Check the year."""
+        current_year = dt.datetime.now().year
+        if year > current_year:
+            raise serializers.ValidationError("invalid value")
+        return year
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Serializer for category requests."""
+
+    class Meta:
+        fields = ('id', 'name', 'slug')
         model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(slug_field='slug', read_only=True)
+    """Serializer for genre requests."""
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'name', 'slug')
         model = Genre
 
 
@@ -45,12 +71,13 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Serializer for review requests."""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
-    title = serializers.SlugRelatedField(
+    titles = serializers.SlugRelatedField(
         slug_field='name', queryset=Title.objects.all())
 
     def validate_score(self, score):
@@ -61,8 +88,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'score', 'pub_date', 'author')
-        read_only_fields = ('id', 'pub_date', 'author')
+        fields = '__all__'
         validators = (
             UniqueTogetherValidator(
                 queryset=Review.objects.all(),
@@ -72,15 +98,14 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentsSerializer(serializers.ModelSerializer):
+    """Serializer for comments requests."""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True)
-    reviews = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Comments
-        fields = ('id', 'text', 'reviews', 'pub_date', 'author')
-        read_only_fields = ('id', 'pub_date', 'author')
+        fields = ('id', 'text', 'pub_date', 'author')
 
 
 class TokenRequestSerializer(serializers.Serializer):
@@ -90,3 +115,24 @@ class TokenRequestSerializer(serializers.Serializer):
 
     class Meta:
         require_fields = ('username', 'confirmation_code')
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Custom User model serializer."""
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role',
+        )
+
+    def update(self, obj, validated_data):
+        """Update user profile."""
+        request = self.context.get('request')
+        user = request.user
+
+        is_admin = user.role == 'admin'
+        if not user.is_superuser or not is_admin:
+            validated_data.pop('role', None)
+
+        return super().update(obj, validated_data)
