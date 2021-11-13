@@ -1,12 +1,11 @@
-import datetime as dt
-from .validate import validate_year
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from django.contrib.auth import get_user_model
 
 from reviews.models import Category, Comments, Genre, Review, Title
+
+from .validate import validate_year
 
 User = get_user_model()
 
@@ -29,6 +28,10 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleReadSerializer (serializers.ModelSerializer):
     """Title serializer for GET request."""
     rating = serializers.IntegerField()
+    genre = serializers.SlugRelatedField(
+        slug_field='name', queryset=Genre.objects.all())
+    category = serializers.SlugRelatedField(
+        slug_field='name', queryset=Category.objects.all())
     year = serializers.IntegerField(validators=[validate_year])
 
     class Meta:
@@ -39,15 +42,14 @@ class TitleReadSerializer (serializers.ModelSerializer):
 class TitleWriteSerializer(serializers.ModelSerializer):
     """Title serializer for POST, PATCH request."""
     genre = serializers.SlugRelatedField(
-        slug_field='titles', queryset=Genre.objects.all())
+        slug_field='name', queryset=Genre.objects.all())
     category = serializers.SlugRelatedField(
-        slug_field='titles', queryset=Category.objects.all())
+        slug_field='name', queryset=Category.objects.all())
     year = serializers.IntegerField(validators=[validate_year])
 
     class Meta:
         fields = '__all__'
         model = Title
-
 
 
 class SignUpSerializer(serializers.ModelSerializer):

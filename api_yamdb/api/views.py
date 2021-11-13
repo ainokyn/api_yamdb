@@ -1,11 +1,8 @@
-from django.http import request
 from rest_framework import (filters, mixins, pagination, permissions, status,
                             viewsets)
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
-from rest_framework.pagination import (LimitOffsetPagination,
-                                       PageNumberPagination)
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,15 +12,15 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models.aggregates import Avg
+from django.http import request
 
-from reviews.models import Category, Genre, Review, Title
+from reviews.models import Category, Genre, Title
 
-from .permissions import IsAdmin, IsAdminOrReadOnly, AnonymModeratorAdminAuthor
+from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleReadSerializer,
-                          TitleWriteSerializer, TokenRequestSerializer,
-                          UserSerializer)
+                          TitleReadSerializer, TitleWriteSerializer,
+                          TokenRequestSerializer, UserSerializer)
 
 User = get_user_model()
 
@@ -124,9 +121,10 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     )
+
     def get_serializer_class(self):
         if self.request.method == 'GET':
-            return TitleReadSerializer 
+            return TitleReadSerializer
         return TitleWriteSerializer
 
 
