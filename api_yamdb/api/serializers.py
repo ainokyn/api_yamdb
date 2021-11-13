@@ -10,7 +10,22 @@ from reviews.models import Category, Comments, Genre, Review, Title
 User = get_user_model()
 
 
-class TitleSerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
+    """Serializer for category requests."""
+
+    class Meta:
+        exclude = ('id',)
+        model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    """Serializer for genre requests."""
+    class Meta:
+        exclude = ('id',)
+        model = Genre
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
     """Serializer for title requests."""
 
     class Meta:
@@ -22,26 +37,12 @@ class TitleSerializer(serializers.ModelSerializer):
             'category')
         model = Title
 
-    def get_year(self, year):
+    def validate_year(self, value):
         """Check the year."""
-        current_year = dt.datetime.now().year
-        if year > current_year:
-            raise serializers.ValidationError("invalid value")
-        return year
-
-class CategorySerializer(serializers.ModelSerializer):
-    """Serializer for category requests."""
-
-    class Meta:
-        fields = ('id', 'name', 'slug')
-        model = Category
-
-
-class GenreSerializer(serializers.ModelSerializer):
-    """Serializer for genre requests."""
-    class Meta:
-        fields = ('id', 'name', 'slug')
-        model = Genre
+        year = dt.date.today().year
+        if value > year:
+            raise serializers.ValidationError('Invalid value')
+        return value
 
 
 class SignUpSerializer(serializers.ModelSerializer):

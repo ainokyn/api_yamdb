@@ -1,5 +1,7 @@
-from rest_framework import filters, pagination, permissions, status, viewsets
+from rest_framework import (filters, mixins, pagination, permissions, status,
+                            viewsets)
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
@@ -11,15 +13,24 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.http import request
 
 from reviews.models import Category, Genre, Title
 
-from .permissions import IsAdmin
+from .permissions import IsAdmin, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleSerializer, TokenRequestSerializer, UserSerializer)
+                          TitleCreateSerializer, TokenRequestSerializer,
+                          UserSerializer)
 
 User = get_user_model()
+
+
+class CustomGetOrPostViewSet(mixins.CreateModelMixin,
+                             mixins.ListModelMixin,
+                             mixins.DestroyModelMixin,
+                             viewsets.GenericViewSet):
+    pass
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -74,29 +85,34 @@ class CommentsViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CustomGetOrPostViewSet):
     """Category endpoint handler."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CustomGetOrPostViewSet):
     """Genre endpoint handler."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
 
 
-class TitleViewSet(viewsets.ModelViewSet):
+class TitleViewSet(CustomGetOrPostViewSet):
     """Title endpoint handler."""
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    pagination_class = LimitOffsetPagination
+    serializer_class = TitleCreateSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('id', 'category', 'genre', 'name', 'year')
 
