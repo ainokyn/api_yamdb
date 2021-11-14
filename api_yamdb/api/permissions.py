@@ -6,12 +6,17 @@ class AnonymModeratorAdminAuthor(permissions.BasePermission):
     edit_methods = ("PUT", "PATCH", "DELETE",)
 
     def has_object_permission(self, request, view, obj):
+        user = request.user
+        if request.method == "POST":
+            return user == user.is_authenticated
         if request.method in permissions.SAFE_METHODS:
-            return (request.method in permissions.SAFE_METHODS)
+            return True
         if request.method in self.edit_methods:
-            if obj.author == request.user:
-                return True
-            return(request.user.role == 'moderator' or 'admin')
+            return (
+                user.role == 'moderator',
+                user.role == 'admin',
+                user == obj.author
+            )
 
 
 class IsAdmin(permissions.BasePermission):

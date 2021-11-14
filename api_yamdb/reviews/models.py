@@ -90,7 +90,7 @@ class Review(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE)
-    titles = models.ForeignKey(
+    title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='reviews')
@@ -106,9 +106,8 @@ class Review(models.Model):
     class Meta:
         """Function for creating a unique combination."""
         constraints = [
-            models.UniqueConstraint(fields=['author', 'titles'],
-                                    name='unique_reviews')
-        ]
+            models.UniqueConstraint(fields=['author', 'title'],
+                                    name='unique_review')]
         verbose_name = 'Review'
         verbose_name_plural = 'Reviews'
 

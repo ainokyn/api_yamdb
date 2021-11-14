@@ -2,6 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, pagination, permissions, status,
                             viewsets)
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -14,7 +15,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models.aggregates import Avg
 
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Comments, Genre, Review, Title
 
 from .customfilters import TitlesFilter
 from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
@@ -39,22 +40,24 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (AnonymModeratorAdminAuthor,)
 
     def get_queryset(self):
-        """Overriding the get_queryset() method."""
-        title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
-        return title.reviews.all()
+        title_id = self.kwargs['title_id']
+        return Review.objects.filter(title=title_id)
 
     def perform_create(self, serializer):
-        """Overriding the perform_create() method."""
-        title_id = self.kwargs.get('title_id')
-        get_object_or_404(Title, id=title_id)
-        serializer.save(author=self.request.user)
+        title_id = self.kwargs['title_id']
+        title = get_object_or_404(Title, id=title_id)
+        if Review.objects.filter(
+                title=title, author=self.request.user).exists():
+            raise ParseError('Нельзя добавить еще один отзыв :)')
+        serializer.save(author=self.request.user,
+                        title=title)
 
     def perform_update(self, serializer):
-        """Overriding the perform_create() method."""
-        title_id = self.kwargs.get('title_id')
-        get_object_or_404(Title, id=title_id)
-        serializer.save(author=self.request.user)
+        title_id = self.kwargs['title_id']
+        title = get_object_or_404(Title, id=title_id)
+        Review.objects.filter(title=title)
+        serializer.save(author=self.request.user,
+                        title=title)
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
@@ -68,24 +71,22 @@ class CommentsViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         title = get_object_or_404(Title, id=title_id)
         reviews = get_object_or_404(title.reviews, id=review_id)
-        return reviews.comments.all()
+        return reviews.comments.filter(reviews=reviews)
 
     def perform_create(self, serializer):
         """Overriding the perform_create() method."""
-        title_id = self.kwargs.get('title_id')
         review_id = self.kwargs.get('review_id')
-        title = get_object_or_404(Title, id=title_id)
-        get_object_or_404(title.reviews, id=review_id)
-        reviews = get_object_or_404(title.reviews, id=review_id)
-        serializer.save(reviews=reviews, author=self.request.user)
+        reviews = get_object_or_404(Review, id=review_id)
+        Comments.objects.filter(reviews=reviews)
+        serializer.save(
+            reviews=reviews,
+            author=self.request.user)
 
     def perform_update(self, serializer):
         """Overriding the perform_update() method."""
-        title_id = self.kwargs.get('title_id')
         review_id = self.kwargs.get('review_id')
-        title = get_object_or_404(Title, id=title_id)
-        get_object_or_404(title.reviews, id=review_id)
-        reviews = get_object_or_404(title.reviews, id=review_id)
+        reviews = get_object_or_404(Review, id=review_id)
+        Comments.objects.filter(reviews=reviews)
         serializer.save(reviews=reviews, author=self.request.user)
 
 
