@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from django.contrib.auth import get_user_model
 
-from reviews.models import Category, Comments, Genre, Review, Title
+from reviews.models import Category, Comments, Genre, GenreTitle, Review, Title
 
 from .validate import validate_year
 
@@ -28,11 +28,8 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleReadSerializer (serializers.ModelSerializer):
     """Title serializer for GET request."""
     rating = serializers.IntegerField()
-    genre = serializers.SlugRelatedField(
-        slug_field='name', queryset=Genre.objects.all())
-    category = serializers.SlugRelatedField(
-        slug_field='name', queryset=Category.objects.all())
-    year = serializers.IntegerField(validators=[validate_year])
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
         fields = '__all__'
@@ -42,10 +39,22 @@ class TitleReadSerializer (serializers.ModelSerializer):
 class TitleWriteSerializer(serializers.ModelSerializer):
     """Title serializer for POST, PATCH request."""
     genre = serializers.SlugRelatedField(
-        slug_field='name', queryset=Genre.objects.all())
+        slug_field='slug',
+        queryset=Genre.objects.all(),
+        many=True,
+        required=False,
+    )
     category = serializers.SlugRelatedField(
-        slug_field='name', queryset=Category.objects.all())
+        slug_field='slug', queryset=Category.objects.all())
     year = serializers.IntegerField(validators=[validate_year])
+
+    def create(self, validated_data):
+        if 'genre' in validated_data:
+            genres = validated_data.pop('genre')
+        title = Title.objects.create(**validated_data)
+        for genre in genres:
+            GenreTitle.objects.create(title=title, genre=genre)
+        return title
 
     class Meta:
         fields = '__all__'
