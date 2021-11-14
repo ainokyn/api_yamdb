@@ -29,9 +29,7 @@ class TitleReadSerializer (serializers.ModelSerializer):
     """Title serializer for GET request."""
     rating = serializers.IntegerField()
     genre = GenreSerializer(many=True)
-    category = serializers.SlugRelatedField(
-        slug_field='name', queryset=Category.objects.all())
-    year = serializers.IntegerField(validators=[validate_year])
+    category = CategorySerializer()
 
     class Meta:
         fields = '__all__'
