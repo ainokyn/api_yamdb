@@ -12,7 +12,7 @@ class TitleAdmin(admin.ModelAdmin):
 
 class ReviewAdmin(admin.ModelAdmin):
     """Class that configures the display of Review  model. """
-    list_display = ('pk', 'author', 'titles', 'text')
+    list_display = ('pk', 'author', 'title', 'text')
     search_fields = ('author',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'

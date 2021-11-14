@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from django.contrib.auth import get_user_model
 
@@ -88,8 +87,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
-    titles = serializers.SlugRelatedField(
-        slug_field='name', queryset=Title.objects.all())
+
+    class Meta:
+        model = Review
+        fields = "__all__"
+        read_only_fields = ('id', 'pub_date', 'author', 'title')
 
     def validate_score(self, score):
         """ Check that the score."""
@@ -97,26 +99,14 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("invalid value")
         return score
 
-    class Meta:
-        model = Review
-        fields = '__all__'
-        validators = (
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('author', 'titles')
-            ),
-        )
-
 
 class CommentsSerializer(serializers.ModelSerializer):
     """Serializer for comments requests."""
-    author = serializers.SlugRelatedField(
-        slug_field='username',
-        read_only=True)
+    author = serializers.ReadOnlyField(source="author.username")
 
     class Meta:
+        fields = ("id", "text", "author", "pub_date")
         model = Comments
-        fields = '__all__'
 
 
 class TokenRequestSerializer(serializers.Serializer):
