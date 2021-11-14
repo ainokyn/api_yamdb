@@ -82,6 +82,7 @@ class GenreTitle(models.Model):
     def __str__(self) -> str:
         return f'{self.genre.name} - {self.title.name}'
 
+
 class Review(models.Model):
     """Description of the Reviews model."""
     SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),

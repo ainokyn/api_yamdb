@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, pagination, permissions, status,
                             viewsets)
 from rest_framework.decorators import action
@@ -12,10 +13,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models.aggregates import Avg
-from django.http import request
 
 from reviews.models import Category, Genre, Title
 
+from .customfilters import TitlesFilter
 from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
@@ -104,7 +105,6 @@ class GenreViewSet(CustomGetOrPostViewSet):
     queryset = Genre.objects.all()
     permission_classes = (IsAdminOrReadOnly,)
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -113,14 +113,13 @@ class GenreViewSet(CustomGetOrPostViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Title endpoint handler."""
-    queryset = Title.objects.all()
-    permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('id', 'category', 'genre', 'name', 'year')
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     )
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend,)
+    filterset_class = TitlesFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
