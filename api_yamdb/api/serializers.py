@@ -99,6 +99,17 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("invalid value")
         return score
 
+    def validate(self, data):
+        review = Review.objects.filter(
+            title=self.context['title'],
+            author=self.context['author']
+        )
+        if review.exists() and self.context['request.method'] == 'POST':
+            raise serializers.ValidationError(
+                'Вы уже писали отзыв на это произведение.'
+            )
+        return data
+
 
 class CommentsSerializer(serializers.ModelSerializer):
     """Serializer for comments requests."""

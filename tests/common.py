@@ -101,16 +101,16 @@ def create_comments(admin_client, admin):
     def create_comment(uclient, title_id, review_id, text):
         data = {'text': text}
         response = uclient.post(f'/api/v1/titles/{title_id}/reviews/{review_id}/comments/', data=data)
-        print("!!!!", response.text, response.status_code)
+        return response.json()['id']
+
     reviews, titles, user, moderator = create_reviews(admin_client, admin)
     client_user = auth_client(user)
     client_moderator = auth_client(moderator)
     result = list()
-    print(result)
     result.append({'id': create_comment(admin_client, titles[0]["id"], reviews[0]["id"], 'qwerty'),
                    'author': admin.username, 'text': 'qwerty'})
     result.append({'id': create_comment(client_user, titles[0]["id"], reviews[0]["id"], 'qwerty123'),
                    'author': user.username, 'text': 'qwerty123'})
     result.append({'id': create_comment(client_moderator, titles[0]["id"], reviews[0]["id"], 'qwerty321'),
                    'author': moderator.username, 'text': 'qwerty321'})
-    print(result, reviews, titles, user, moderator)
+    return result, reviews, titles, user, moderator

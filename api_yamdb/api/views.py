@@ -37,7 +37,9 @@ class CustomGetOrPostViewSet(mixins.CreateModelMixin,
 class ReviewViewSet(viewsets.ModelViewSet):
     """Review endpoint handler."""
     serializer_class = ReviewSerializer
-    permission_classes = (AnonymModeratorAdminAuthor,)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly, AnonymModeratorAdminAuthor,
+    )
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
@@ -59,10 +61,21 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user,
                         title=title)
 
+    def get_serializer_context(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        context = super(ReviewViewSet, self).get_serializer_context()
+        context.update({'title': title,
+                        'author': self.request.user,
+                        'request.method': self.request.method})
+        return context
+
 
 class CommentsViewSet(viewsets.ModelViewSet):
     """Comments endpoint handler."""
-    permission_classes = (AnonymModeratorAdminAuthor,)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly, AnonymModeratorAdminAuthor,
+    )
     serializer_class = CommentsSerializer
 
     def get_queryset(self):
