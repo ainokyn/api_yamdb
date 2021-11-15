@@ -148,4 +148,4 @@ dmypy.json
 # папки со статикой и медиа
 media/
 
-open_csv.py
+api_yamdb/open_csv.py
