@@ -1,5 +1,7 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from django.contrib.auth import get_user_model
+
 from reviews.models import Category, Comments, Genre, GenreTitle, Review, Title
 
 from .validate import validate_year
