@@ -13,10 +13,11 @@ class AnonymModeratorAdminAuthor(permissions.BasePermission):
             return True
         if request.method in self.edit_methods:
             return (
-                user.role == 'moderator' or
-                user.role == 'admin' or
-                user == obj.author
+                (user.role == 'moderator'
+                 or user.role == 'admin'
+                 or user == obj.author)
             )
+        return False
 
 
 class IsAdmin(permissions.BasePermission):
