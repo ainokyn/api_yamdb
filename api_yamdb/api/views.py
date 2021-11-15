@@ -43,7 +43,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title_id = self.kwargs['title_id']
-        return Review.objects.filter(title=title_id)
+        return Review.objects.filter(title=title_id).order_by('id')
 
     def perform_create(self, serializer):
         title_id = self.kwargs['title_id']
@@ -84,7 +84,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         title = get_object_or_404(Title, id=title_id)
         reviews = get_object_or_404(title.reviews, id=review_id)
-        return reviews.comments.filter(reviews=reviews)
+        return reviews.comments.filter(reviews=reviews).order_by('id')
 
     def perform_create(self, serializer):
         """Overriding the perform_create() method."""
@@ -129,7 +129,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """Title endpoint handler."""
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
-    )
+    ).order_by('id')
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter, DjangoFilterBackend,)
