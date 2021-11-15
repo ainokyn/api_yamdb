@@ -12,7 +12,6 @@ from django.db.models.aggregates import Avg
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
 from reviews.models import Category, Comments, Genre, Review, Title
 
 from .customfilters import TitlesFilter
