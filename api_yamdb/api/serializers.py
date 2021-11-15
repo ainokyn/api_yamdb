@@ -1,9 +1,8 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-
-from .validate import validate_year
 from reviews.models import Category, Comments, Genre, GenreTitle, Review, Title
 
+from .validate import validate_year
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
