@@ -2,6 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, pagination, permissions, status,
                             viewsets)
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,7 +23,7 @@ from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           TokenRequestSerializer, UserSerializer)
-from rest_framework.exceptions import ParseError
+
 
 User = get_user_model()
 
