@@ -17,9 +17,9 @@ from django.db.models import Avg
 from api.customfilters import TitlesFilter
 from api.permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
 from api.serializers import (CategorySerializer, CommentsSerializer,
-                          GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleReadSerializer, TitleWriteSerializer,
-                          TokenRequestSerializer, UserSerializer)
+                             GenreSerializer, ReviewSerializer, SignUpSerializer,
+                             TitleReadSerializer, TitleWriteSerializer,
+                             TokenRequestSerializer, UserSerializer)
 from reviews.models import Category, Comments, Genre, Review, Title
 
 User = get_user_model()
