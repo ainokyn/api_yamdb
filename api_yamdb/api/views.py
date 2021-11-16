@@ -22,6 +22,7 @@ from .serializers import (CategorySerializer, CommentsSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           TokenRequestSerializer, UserSerializer)
+from rest_framework.exceptions import ParseError
 
 User = get_user_model()
 
