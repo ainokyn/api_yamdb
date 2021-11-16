@@ -4,9 +4,9 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.exceptions import ParseError
 from rest_framework.views import APIView
 from django.core.mail import send_mail
+from rest_framework.exceptions import ParseError
 from django.db.models import Avg
 from rest_framework.generics import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
