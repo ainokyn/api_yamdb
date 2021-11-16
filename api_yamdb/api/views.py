@@ -4,13 +4,13 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.db.models import Avg
 from rest_framework.views import APIView
 from django.core.mail import send_mail
-from django.db.models import Avg
 from rest_framework.generics import get_object_or_404
-from rest_framework.exceptions import ParseError
 from django_filters.rest_framework import DjangoFilterBackend
 from .customfilters import TitlesFilter
+from rest_framework.exceptions import ParseError
 from django.conf import settings
 from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, CommentsSerializer,
@@ -18,8 +18,8 @@ from .serializers import (CategorySerializer, CommentsSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           TokenRequestSerializer, UserSerializer)
 from reviews.models import Category, Comments, Genre, Review, Title
-from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
