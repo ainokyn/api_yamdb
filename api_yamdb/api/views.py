@@ -9,11 +9,13 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from api.customfilters import TitlesFilter
-from api.permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
+from api.permissions import (AnonymModeratorAdminAuthor, IsAdmin,
+                             IsAdminOrReadOnly)
 from api.serializers import (CategorySerializer, CommentsSerializer,
-                          GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleReadSerializer, TitleWriteSerializer,
-                          TokenRequestSerializer, UserSerializer)
+                             GenreSerializer, ReviewSerializer,
+                             SignUpSerializer,
+                             TitleReadSerializer, TitleWriteSerializer,
+                             TokenRequestSerializer, UserSerializer)
 from reviews.models import Category, Comments, Genre, Review, Title
 from rest_framework.exceptions import ParseError
 from django.contrib.auth import get_user_model
