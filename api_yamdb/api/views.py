@@ -8,19 +8,18 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
 
-from api.customfilters import TitlesFilter
-from api.permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
-from api.serializers import (CategorySerializer, CommentsSerializer,
-                             GenreSerializer, ReviewSerializer, SignUpSerializer,
-                             TitleReadSerializer, TitleWriteSerializer,
-                             TokenRequestSerializer, UserSerializer)
 from reviews.models import Category, Comments, Genre, Review, Title
+from .customfilters import TitlesFilter
+from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
+from .serializers import (CategorySerializer, CommentsSerializer,
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
+                          TokenRequestSerializer, UserSerializer)
 
 User = get_user_model()
 
