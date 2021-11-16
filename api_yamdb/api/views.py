@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from rest_framework.generics import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+
 from .customfilters import TitlesFilter
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -20,7 +21,6 @@ from .serializers import (CategorySerializer, CommentsSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           TokenRequestSerializer, UserSerializer)
 from reviews.models import Category, Comments, Genre, Review, Title
-
 
 User = get_user_model()
 
