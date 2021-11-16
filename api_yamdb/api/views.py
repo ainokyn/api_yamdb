@@ -1,3 +1,9 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, pagination, permissions, status,
                             viewsets)
@@ -7,12 +13,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.db.models import Avg
-from django.shortcuts import get_object_or_404
 
 from .customfilters import TitlesFilter
 from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
@@ -21,7 +21,6 @@ from .serializers import (CategorySerializer, CommentsSerializer,
                           TitleReadSerializer, TitleWriteSerializer,
                           TokenRequestSerializer, UserSerializer)
 from reviews.models import Category, Comments, Genre, Review, Title
-
 
 User = get_user_model()
 
