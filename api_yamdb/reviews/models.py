@@ -85,8 +85,6 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     """Description of the Reviews model."""
-    SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
-                     (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), ]
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE)
@@ -96,7 +94,6 @@ class Review(models.Model):
         related_name='reviews')
     text = models.TextField()
     score = models.IntegerField(
-        choices=SCORE_CHOICES,
         default=1, verbose_name='score',
         validators=[MinValueValidator(1),
                     MaxValueValidator(10)])
