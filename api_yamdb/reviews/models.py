@@ -78,8 +78,8 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='Genre_title')
-    title = models.ForeignKey(Title, on_delete=models.CASCADE, verbose_name='Genre_title')
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='Genre_of_title')
+    title = models.ForeignKey(Title, on_delete=models.CASCADE, verbose_name='title_whith_genre')
 
     def __str__(self) -> str:
         return f'{self.genre.name} - {self.title.name}'
