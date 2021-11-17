@@ -102,6 +102,7 @@ class Review(models.Model):
 
     class Meta:
         """Function for creating a unique combination."""
+        ordering = ('id',)
         constraints = [
             models.UniqueConstraint(fields=['author', 'title'],
                                     name='unique_review')]
@@ -122,6 +123,7 @@ class Comments(models.Model):
         'date of publication comment', auto_now_add=True, db_index=True)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Comment'
         verbose_name_plural = 'Comments'
 

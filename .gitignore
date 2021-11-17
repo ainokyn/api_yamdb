@@ -149,3 +149,4 @@ dmypy.json
 media/
 
 api_yamdb/open_csv.py
+api_yamdb/=
