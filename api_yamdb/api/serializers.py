@@ -1,5 +1,7 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from django.contrib.auth import get_user_model
+
 from reviews.models import Category, Comments, Genre, GenreTitle, Review, Title
 
 from .validate import validate_year
@@ -39,19 +41,10 @@ class TitleWriteSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Genre.objects.all(),
         many=True,
-        required=False,
     )
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all())
     year = serializers.IntegerField(validators=[validate_year])
-
-    def create(self, validated_data):
-        if 'genre' in validated_data:
-            genres = validated_data.pop('genre')
-        title = Title.objects.create(**validated_data)
-        for genre in genres:
-            GenreTitle.objects.create(title=title, genre=genre)
-        return title
 
     class Meta:
         fields = '__all__'
