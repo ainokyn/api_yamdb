@@ -115,7 +115,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     """Title endpoint handler."""
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
-    ).order_by('id')
+    )
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter, DjangoFilterBackend,)
