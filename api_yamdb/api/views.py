@@ -8,7 +8,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (filters, mixins, pagination, permissions, status,
                             viewsets)
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.exceptions import ParseError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -42,11 +41,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return Review.objects.filter(title=title_id).order_by('id')
 
     def perform_create(self, serializer):
-        title_id = self.kwargs['title_id']
-        title = get_object_or_404(Title, id=title_id)
-        if Review.objects.filter(
-                title=title, author=self.request.user).exists():
-            raise ParseError('Нельзя добавить еще один отзыв :)')
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
         serializer.save(author=self.request.user,
                         title=title)
 
