@@ -93,8 +93,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         review = Review.objects.filter(
-            title=self.context['title'],
-            author=self.context['author']
+            title_id=self.context.get('title').id,
+            author=self.context.get('author')
         )
         if review.exists() and self.context['request.method'] == 'POST':
             raise serializers.ValidationError(

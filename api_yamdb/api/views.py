@@ -37,8 +37,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
-        title_id = self.kwargs['title_id']
-        return Review.objects.filter(title=title_id).order_by('id')
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
+        return title.reviews.filter(title=title)
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs['title_id'])
@@ -46,15 +46,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
                         title=title)
 
     def perform_update(self, serializer):
-        title_id = self.kwargs['title_id']
-        title = get_object_or_404(Title, id=title_id)
-        Review.objects.filter(title=title)
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
         serializer.save(author=self.request.user,
                         title=title)
 
     def get_serializer_context(self):
-        title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
+        title = get_object_or_404(Title, id=self.kwargs['title_id'])
         context = super(ReviewViewSet, self).get_serializer_context()
         context.update({'title': title,
                         'author': self.request.user,
@@ -71,26 +68,31 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Overriding the get_queryset() method."""
-        title_id = self.kwargs.get('title_id')
-        review_id = self.kwargs.get('review_id')
-        title = get_object_or_404(Title, id=title_id)
-        reviews = get_object_or_404(title.reviews, id=review_id)
-        return reviews.comments.filter(reviews=reviews).order_by('id')
+        reviews = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title_id=self.kwargs.get('title_id')
+        )
+        return reviews.comments.filter(reviews=reviews)
 
     def perform_create(self, serializer):
         """Overriding the perform_create() method."""
-        review_id = self.kwargs.get('review_id')
-        reviews = get_object_or_404(Review, id=review_id)
-        Comments.objects.filter(reviews=reviews)
+        reviews = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title_id=self.kwargs.get('title_id')
+        )
         serializer.save(
             reviews=reviews,
             author=self.request.user)
 
     def perform_update(self, serializer):
         """Overriding the perform_update() method."""
-        review_id = self.kwargs.get('review_id')
-        reviews = get_object_or_404(Review, id=review_id)
-        Comments.objects.filter(reviews=reviews)
+        reviews = get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title_id=self.kwargs.get('title_id')
+        )
         serializer.save(reviews=reviews, author=self.request.user)
 
 

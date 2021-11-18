@@ -11,7 +11,7 @@ class Genre(models.Model):
     One title can be linked to several genres.
     """
     name = models.CharField(max_length=200, verbose_name='Genre', unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, verbose_name='Genre_slug',unique=True)
 
     class Meta:
         ordering = ('id',)
@@ -28,7 +28,7 @@ class Category(models.Model):
     """
     name = models.CharField(max_length=200, verbose_name='Category',
                             unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, verbose_name='Category_slug', unique=True)
 
     class Meta:
         ordering = ('id',)
@@ -57,6 +57,7 @@ class Title(models.Model):
         Genre,
         through='GenreTitle',
         related_name='titles',
+        verbose_name='Genre_title',
     )
     category = models.ForeignKey(
         Category,
@@ -64,6 +65,7 @@ class Title(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         related_name='titles',
+        verbose_name='Category_title',
     )
 
     class Meta:
@@ -76,8 +78,8 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
-    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='Genre_of_title')
+    title = models.ForeignKey(Title, on_delete=models.CASCADE, verbose_name='title_whith_genre')
 
     def __str__(self) -> str:
         return f'{self.genre.name} - {self.title.name}'
@@ -85,18 +87,19 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     """Description of the Reviews model."""
-    SCORE_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'),
-                     (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10'), ]
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+        verbose_name='author_review',
+    )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews')
+        related_name='reviews',
+        verbose_name='title_review',
+    )
     text = models.TextField()
     score = models.IntegerField(
-        choices=SCORE_CHOICES,
         default=1, verbose_name='score',
         validators=[MinValueValidator(1),
                     MaxValueValidator(10)])
@@ -105,6 +108,7 @@ class Review(models.Model):
 
     class Meta:
         """Function for creating a unique combination."""
+        ordering = ('id',)
         constraints = [
             models.UniqueConstraint(fields=['author', 'title'],
                                     name='unique_review')]
@@ -117,14 +121,15 @@ class Review(models.Model):
 
 class Comments(models.Model):
     """Description of the Comments model."""
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='author_comment')
     reviews = models.ForeignKey(Review, on_delete=models.CASCADE,
-                                related_name='comments')
+                                related_name='comments', verbose_name='reviews_comment')
     text = models.TextField()
     pub_date = models.DateTimeField(
         'date of publication comment', auto_now_add=True, db_index=True)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Comment'
         verbose_name_plural = 'Comments'
 
