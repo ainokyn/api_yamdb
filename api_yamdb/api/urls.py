@@ -5,7 +5,6 @@ from .views import create_token, sign_up
 from .views import (CategoryViewSet, CommentsViewSet,
                     GenreViewSet, ReviewViewSet, TitleViewSet,
                     UserViewSet)
-
 router = DefaultRouter()
 router.register(r'titles/(?P<title_id>\d+)/reviews', ReviewViewSet,
                 basename='reviews'),
