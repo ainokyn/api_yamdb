@@ -1,5 +1,7 @@
+import rest_framework.validators
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comments, Genre, GenreTitle, Review, Title
 
 from .validate import validate_year
@@ -60,11 +62,16 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
 class SignUpSerializer(serializers.ModelSerializer):
     """Serializer for signup requests."""
+    username = serializers.CharField(
+        validators=(UniqueValidator(queryset=User.objects.all()),)
+    )
+    email = serializers.EmailField(
+        validators=(UniqueValidator(queryset=User.objects.all()),)
+    )
 
     class Meta:
         model = User
-        fields = ('email', 'username')
-        unique = ('email', 'username')
+        fields = ('email', 'username',)
 
     def validate_username(self, value):
         """Check if the username is not 'me'."""
@@ -72,10 +79,6 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'forbidden to use the name \'me\' as username.')
         return value
-
-    def create(self, validated_data):
-        """Create an user with validated data."""
-        return User.objects.create_user(**validated_data)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

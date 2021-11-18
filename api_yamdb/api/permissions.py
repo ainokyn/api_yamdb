@@ -13,9 +13,9 @@ class AnonymModeratorAdminAuthor(permissions.BasePermission):
             return True
         if request.method in self.edit_methods:
             return (
-                (user.role == 'moderator'
-                 or user.role == 'admin'
-                 or user == obj.author)
+                user.is_moderator()
+                or user.is_admin()
+                or user == obj.author
             )
         return False
 
@@ -24,10 +24,7 @@ class IsAdmin(permissions.BasePermission):
     """Allow access for superuser or for user with admin role."""
     def has_permission(self, request, view):
         user = request.user
-        return (
-            user.is_authenticated
-            and (user.role == 'admin' or user.is_superuser)
-        )
+        return user.is_authenticated and user.is_admin()
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
@@ -40,8 +37,6 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return (
             request.method in permissions.SAFE_METHODS
             or (
-                user.is_authenticated and (
-                    user.role == 'admin' or user.is_superuser
-                )
+                user.is_authenticated and user.is_admin()
             )
         )

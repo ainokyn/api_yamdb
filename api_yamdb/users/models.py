@@ -54,8 +54,19 @@ class CustomUser(AbstractUser):
         default='user',
         verbose_name='Роль'
     )
+    confirmation_code = models.CharField(
+        max_length=128, null=True, blank=True
+    )
 
     objects = CustomUserManager()
+
+    def is_admin(self):
+        """Check if user is admin."""
+        return self.role == 'admin' or self.is_superuser
+
+    def is_moderator(self):
+        """Check if user is moderator."""
+        return self.role == 'moderator' or self.is_staff
 
     class Meta:
         verbose_name = 'Пользователь'
