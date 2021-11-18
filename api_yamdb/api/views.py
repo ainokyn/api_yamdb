@@ -11,7 +11,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from reviews.models import Category, Comments, Genre, Review, Title
+from reviews.models import Category, Genre, Review, Title
 from .customfilters import TitlesFilter
 from .permissions import AnonymModeratorAdminAuthor, IsAdmin, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, CommentsSerializer,
@@ -49,14 +49,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, id=self.kwargs['title_id'])
         serializer.save(author=self.request.user,
                         title=title)
-
-    def get_serializer_context(self):
-        title = get_object_or_404(Title, id=self.kwargs['title_id'])
-        context = super(ReviewViewSet, self).get_serializer_context()
-        context.update({'title': title,
-                        'author': self.request.user,
-                        'request.method': self.request.method})
-        return context
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
