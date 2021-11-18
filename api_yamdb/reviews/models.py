@@ -11,7 +11,8 @@ class Genre(models.Model):
     One title can be linked to several genres.
     """
     name = models.CharField(max_length=200, verbose_name='Genre', unique=True)
-    slug = models.SlugField(max_length=50, verbose_name='Genre_slug',unique=True)
+    slug = models.SlugField(max_length=50, verbose_name='Genre_slug',
+                            unique=True)
 
     class Meta:
         ordering = ('id',)
@@ -28,7 +29,8 @@ class Category(models.Model):
     """
     name = models.CharField(max_length=200, verbose_name='Category',
                             unique=True)
-    slug = models.SlugField(max_length=50, verbose_name='Category_slug', unique=True)
+    slug = models.SlugField(max_length=50, verbose_name='Category_slug',
+                            unique=True)
 
     class Meta:
         ordering = ('id',)
@@ -78,8 +80,10 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='Genre_of_title')
-    title = models.ForeignKey(Title, on_delete=models.CASCADE, verbose_name='title_whith_genre')
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE,
+                              verbose_name='Genre_of_title')
+    title = models.ForeignKey(Title, on_delete=models.CASCADE,
+                              verbose_name='title_whith_genre')
 
     def __str__(self) -> str:
         return f'{self.genre.name} - {self.title.name}'
@@ -121,9 +125,11 @@ class Review(models.Model):
 
 class Comments(models.Model):
     """Description of the Comments model."""
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='author_comment')
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               verbose_name='author_comment')
     reviews = models.ForeignKey(Review, on_delete=models.CASCADE,
-                                related_name='comments', verbose_name='reviews_comment')
+                                related_name='comments',
+                                verbose_name='reviews_comment')
     text = models.TextField()
     pub_date = models.DateTimeField(
         'date of publication comment', auto_now_add=True, db_index=True)

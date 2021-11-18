@@ -1,9 +1,7 @@
-import rest_framework.validators
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comments, Genre, Review, Title
-
 from .validate import validate_year
 
 User = get_user_model()
@@ -40,7 +38,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all(),
-        many=True,
+        many=True
     )
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all())
@@ -92,11 +90,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         return score
 
     def validate(self, data):
+        title_id = self.context.get(
+            'request').parser_context['kwargs']['title_id']
+        author = self.context.get('request').user
         review = Review.objects.filter(
-            title_id=self.context.get('title').id,
-            author=self.context.get('author')
+            title_id=title_id,
+            author=author
         )
-        if review.exists() and self.context['request.method'] == 'POST':
+        if review.exists() and self.context.get('request').method == 'POST':
             raise serializers.ValidationError(
                 'Вы уже писали отзыв на это произведение.'
             )
