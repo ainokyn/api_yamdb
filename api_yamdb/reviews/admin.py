@@ -20,7 +20,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 class CommentsAdmin(admin.ModelAdmin):
     """Class that configures the display of Comments  model. """
-    list_display = ('pk', 'author', 'reviews', 'text')
+    list_display = ('pk', 'author', 'review', 'text')
     search_fields = ('author',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'

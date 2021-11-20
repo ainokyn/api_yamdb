@@ -78,6 +78,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
+    score = serializers.IntegerField()
 
     class Meta:
         model = Review

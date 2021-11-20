@@ -99,7 +99,7 @@ class Review(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
-        related_name='reviews',
+        related_name='review',
         verbose_name='title_review',
     )
     text = models.TextField()
@@ -127,9 +127,9 @@ class Comments(models.Model):
     """Description of the Comments model."""
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                verbose_name='author_comment')
-    reviews = models.ForeignKey(Review, on_delete=models.CASCADE,
-                                related_name='comments',
-                                verbose_name='reviews_comment')
+    review = models.ForeignKey(Review, on_delete=models.CASCADE,
+                               related_name='comments',
+                               verbose_name='review_comment')
     text = models.TextField()
     pub_date = models.DateTimeField(
         'date of publication comment', auto_now_add=True, db_index=True)

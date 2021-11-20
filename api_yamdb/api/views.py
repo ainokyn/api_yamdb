@@ -39,7 +39,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs['title_id'])
-        return title.reviews.filter(title=title)
+        return title.review.all()
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, id=self.kwargs['title_id'])
@@ -61,32 +61,32 @@ class CommentsViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Overriding the get_queryset() method."""
-        reviews = get_object_or_404(
+        review = get_object_or_404(
             Review,
             id=self.kwargs.get('review_id'),
-            title_id=self.kwargs.get('title_id')
+            title__id=self.kwargs.get('title_id')
         )
-        return reviews.comments.filter(reviews=reviews)
+        return review.comments.all()
 
     def perform_create(self, serializer):
         """Overriding the perform_create() method."""
-        reviews = get_object_or_404(
+        review = get_object_or_404(
             Review,
             id=self.kwargs.get('review_id'),
-            title_id=self.kwargs.get('title_id')
+            title__id=self.kwargs.get('title_id')
         )
         serializer.save(
-            reviews=reviews,
+            review=review,
             author=self.request.user)
 
     def perform_update(self, serializer):
         """Overriding the perform_update() method."""
-        reviews = get_object_or_404(
+        review = get_object_or_404(
             Review,
             id=self.kwargs.get('review_id'),
-            title_id=self.kwargs.get('title_id')
+            title__id=self.kwargs.get('title_id')
         )
-        serializer.save(reviews=reviews, author=self.request.user)
+        serializer.save(review=review, author=self.request.user)
 
 
 class CategoryViewSet(CustomGetOrPostViewSet):
@@ -114,7 +114,7 @@ class GenreViewSet(CustomGetOrPostViewSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Title endpoint handler."""
     queryset = Title.objects.annotate(
-        rating=Avg('reviews__score')
+        rating=Avg('review__score')
     )
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
